@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The commander anomalyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet"/>
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mana-font@latest/css/mana.min.css">
+  <style>
+    :root {
+      --parchment: #f2e8d5;
+      --parchment-dark: #e0ceaa;
+      --parchment-shadow: #c9a96e;
+      --ink: #2c1a0e;
+      --ink-faded: #5c3d1e;
+      --ink-light: #8b5e3c;
+      --gold: #c9922a;
+      --gold-bright: #e8b84b;
+      --gold-dark: #7a5415;
+      --red-wax: #8b1a1a;
+      --accent: #4a1942;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: #1a0f07;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, #2a1505 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, #1a0a0a 0%, transparent 60%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'IM Fell English', serif;
+      padding: 40px 20px;
+    }
+
+    /* Candle flicker ambient lights */
+    body::before,
+    body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: flicker 4s ease-in-out infinite alternate;
+    }
+
+    body::before {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(200, 120, 30, 0.12) 0%, transparent 70%);
+      top: 10%;
+      left: 5%;
+    }
+
+    body::after {
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(200, 100, 20, 0.10) 0%, transparent 70%);
+      bottom: 10%;
+      right: 5%;
+      animation-delay: 2s;
+    }
+
+    @keyframes flicker {
+      0% {
+        opacity: 0.7;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+
+      100% {
+        opacity: 0.8;
+        transform: scale(0.97);
+      }
+    }
+
+    .tome {
+      position: relative;
+      width: 100%;
+      max-width: 620px;
+      background: var(--parchment);
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0.3'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23p)' opacity='0.15'/%3E%3C/svg%3E"),
+        linear-gradient(160deg, #f5edd8 0%, #ecdbb8 40%, #e8d4a8 100%);
+      border-radius: 2px;
+      padding: 50px 55px;
+      box-shadow:
+        0 0 0 1px var(--parchment-shadow),
+        0 0 0 6px #3d1f08,
+        0 0 0 8px #5a2e0a,
+        0 0 0 12px #2a1405,
+        8px 12px 40px rgba(0, 0, 0, 0.8),
+        -4px -4px 20px rgba(0, 0, 0, 0.4),
+        inset 0 0 80px rgba(180, 130, 60, 0.15);
+      overflow: hidden;
+    }
+
+    /* Aged edges */
+    .tome::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 0% 0%, rgba(100, 60, 10, 0.25) 0%, transparent 40%),
+        radial-gradient(ellipse at 100% 0%, rgba(80, 40, 5, 0.2) 0%, transparent 35%),
+        radial-gradient(ellipse at 0% 100%, rgba(100, 60, 10, 0.2) 0%, transparent 35%),
+        radial-gradient(ellipse at 100% 100%, rgba(80, 40, 5, 0.25) 0%, transparent 40%);
+      pointer-events: none;
+      border-radius: 2px;
+    }
+
+    /* Spine line */
+    .tome::after {
+      content: '';
+      position: absolute;
+      left: 40px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--parchment-shadow) 20%, var(--parchment-shadow) 80%, transparent);
+      opacity: 0.5;
+    }
+
+    /* Corner ornaments */
+    .corner {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      opacity: 0.6;
+    }
+
+    .corner svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .corner.tl {
+      top: 12px;
+      left: 12px;
+    }
+
+    .corner.tr {
+      top: 12px;
+      right: 12px;
+      transform: scaleX(-1);
+    }
+
+    .corner.bl {
+      bottom: 12px;
+      left: 12px;
+      transform: scaleY(-1);
+    }
+
+    .corner.br {
+      bottom: 12px;
+      right: 12px;
+      transform: scale(-1);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+    }
+
+    .tome-title {
+      font-family: 'Philosopher', serif;
+      font-size: 2.8rem;
+      color: var(--ink);
+      line-height: 1;
+      text-shadow: 1px 1px 0 rgba(200, 150, 60, 0.3);
+      letter-spacing: 2px;
+    }
+
+    .tome-subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      color: var(--ink-light);
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--parchment-shadow), transparent);
+    }
+
+    .divider-glyph {
+      color: var(--gold);
+      font-size: 1.1rem;
+      opacity: 0.8;
+    }
+
+    /* The scroll/card area */
+    .modifier-display {
+      min-height: 180px;
+      background:
+        linear-gradient(135deg, rgba(180, 130, 60, 0.08) 0%, transparent 50%),
+        rgba(210, 175, 100, 0.12);
+      border: 1px solid var(--parchment-shadow);
+      border-radius: 1px;
+      padding: 30px 28px;
+      margin: 20px 0 28px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow:
+        inset 0 2px 8px rgba(100, 60, 10, 0.12),
+        inset 0 -2px 8px rgba(100, 60, 10, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .modifier-display::before,
+    .modifier-display::after {
+      content: '✦';
+      position: absolute;
+      color: var(--gold);
+      font-size: 0.7rem;
+      opacity: 0.6;
+    }
+
+    .modifier-display::before {
+      top: 8px;
+      left: 12px;
+    }
+
+    .modifier-display::after {
+      bottom: 8px;
+      right: 12px;
+    }
+
+    .modifier-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 14px;
+      letter-spacing: 1px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .modifier-desc {
+      font-family: 'IM Fell English', serif;
+      font-size: 1rem;
+      color: var(--ink-faded);
+      line-height: 1.7;
+      font-style: italic;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+    }
+
+    .modifier-desc a {
+      color: var(--gold-dark);
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 3px;
+      font-style: italic;
+      transition: color 0.2s ease;
+    }
+
+    .modifier-desc a:hover {
+      color: var(--gold);
+    }
+
+    .modifier-desc img {
+      display: block;
+      margin: 12px auto 0;
+      max-width: 100%;
+      border: 1px solid var(--parchment-shadow);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .modifier-display.revealed .modifier-name,
+    .modifier-display.revealed .modifier-desc {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .placeholder-text {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      color: var(--ink-light);
+      opacity: 0.5;
+      font-size: 0.95rem;
+      transition: opacity 0.3s;
+    }
+
+    .modifier-display.revealed .placeholder-text {
+      display: none;
+    }
+
+    /* The button */
+    .draw-btn {
+      display: block;
+      width: 100%;
+      padding: 16px 24px;
+      background:
+        linear-gradient(160deg, #3d1f08 0%, #2a1205 50%, #1f0d03 100%);
+      border: none;
+      border-top: 1px solid #7a4a1a;
+      border-bottom: 1px solid #0f0703;
+      color: var(--gold-bright);
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(200, 150, 60, 0.2);
+    }
+
+    .draw-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(160deg, rgba(200, 150, 60, 0.1) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .draw-btn:hover::before {
+      opacity: 1;
+    }
+
+    .draw-btn:hover {
+      box-shadow: 0 4px 20px rgba(200, 140, 40, 0.25), inset 0 1px 0 rgba(200, 150, 60, 0.3);
+      color: #f0d070;
+    }
+
+    .draw-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .draw-btn .btn-glyph {
+      margin: 0 8px;
+      opacity: 0.7;
+    }
+
+    /* Rune decorations */
+    .runes {
+      text-align: center;
+      margin-top: 22px;
+      font-family: 'IM Fell English', serif;
+      font-size: 0.72rem;
+      color: var(--ink-light);
+      opacity: 0.45;
+      letter-spacing: 6px;
+    }
+
+    /* Roll animation */
+    @keyframes pageFlip {
+      0% {
+        opacity: 1;
+        transform: rotateX(0deg);
+      }
+
+      40% {
+        opacity: 0;
+        transform: rotateX(15deg) scale(0.97);
+      }
+
+      60% {
+        opacity: 0;
+        transform: rotateX(-5deg) scale(0.98);
+      }
+
+      100% {
+        opacity: 1;
+        transform: rotateX(0deg);
+      }
+    }
+
+    .modifier-display.flipping {
+      animation: pageFlip 0.6s ease;
+    }
+
+    /* Wax seal */
+    .wax-seal {
+      position: absolute;
+      bottom: -18px;
+      right: 30px;
+      width: 44px;
+      height: 44px;
+      background: radial-gradient(circle at 40% 35%, #c0291d, #7a0f0f);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 200, 180, 0.7);
+      font-size: 1.1rem;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 150, 130, 0.2);
+      z-index: 2;
+    }
+
+    @media (max-width: 480px) {
+      .tome {
+        padding: 36px 28px;
+      }
+
+      .tome-title {
+        font-size: 2.1rem;
+      }
+
+      .modifier-name {
+        font-size: 1.15rem;
+      }
+    }
+
+    /* Chaos toggle */
+    .chaos-toggle {
+        display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;  /* ← this is the fix */
+    }
+
+    .seal-body {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #7a0f0f, #3a0505);
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      gap: 20px;
+      justify-content: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.4), inset 0 1px 2px rgba(255,150,130,0.15);
+      transition: all 0.3s ease;
+      border: 1px solid #5a0a0a;
+    }
+
+    .seal-icon {
+      font-size: 1.1rem;
+      color: rgba(255, 180, 160, 0.6);
+      transition: all 0.3s ease;
+    }
+
+    .chaos-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink-light);
+      opacity: 0.6;
+      transition: all 0.3s ease;
+    }
+
+    .chaos-toggle.active .seal-body {
+      background: radial-gradient(circle at 40% 35%, #c0291d, #7a0f0f);
+      box-shadow: 0 3px 16px rgba(180, 30, 20, 0.6), inset 0 1px 2px rgba(255,150,130,0.3);
+    }
+
+    .chaos-toggle.active .seal-icon {
+      color: rgba(255, 210, 190, 0.95);
+      text-shadow: 0 0 8px rgba(255,100,80,0.6);
+    }
+
+    .chaos-toggle.active .chaos-label {
+      color: var(--red-wax);
+      opacity: 1;
+    }
+
+    .chaos-toggle:hover .seal-body {
+      transform: scale(1.08);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="tome">
+    <!-- Corner ornaments -->
+    <div class="corner tl">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 4 L4 20 M4 4 L20 4" stroke="#8b6534" stroke-width="1.5" fill="none" />
+        <path d="M4 4 L14 14" stroke="#8b6534" stroke-width="0.8" opacity="0.5" />
+        <circle cx="4" cy="4" r="2" fill="#8b6534" opacity="0.6" />
+        <path d="M10 4 Q14 4 14 8 Q14 14 20 14" stroke="#8b6534" stroke-width="0.8" fill="none" opacity="0.4" />
+      </svg>
+    </div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+
+    <div class="header">
+      <div class="tome-title">The commander anomalyzer</div>
+      <div class="tome-subtitle">Select 1 per game &nbsp;✦&nbsp; Balance not guaranteed</div>
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-glyph">⚜</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="modifier-display" id="display">
+      <div class="placeholder-text">Draw forth thy anomaly from the ancient tome...</div>
+      <div class="modifier-name" id="mod-name"></div>
+      <div class="modifier-desc" id="mod-desc"></div>
+      
+    </div>
+
+  <div class="chaos-toggle" onclick="toggleChaos()" id="chaosToggle" title="Toggle Chaos Mode">
+    <div class="seal-body">
+      <span class="seal-icon">☽</span>
+    </div>
+    <p class="chaos-label">Chaos Mode</p>
+
+  </div>
+    
+
+    <button class="draw-btn" id="drawBtn" onclick="drawModifier()">
+      <span class="btn-glyph">᛭</span>
+      Reveal the Anomaly
+      <span class="btn-glyph">᛭</span>
+    </button>
+
+    <div class="runes">ᚠ &nbsp; ᚢ &nbsp; ᚦ &nbsp; ᚨ &nbsp; ᚱ &nbsp; ᚲ &nbsp; ᚷ &nbsp; ᚹ</div>
+  </div>
+
+  <script>
+    const MODIFIERS = [
+      { name: "You Activated my Trap Card!", desc: `All permanents have <a href="https://mtg.fandom.com/wiki/Morph" target="_blank">Morph</a>, where its morph cost is equal to the card's mana cost minus {1}.` },
+      { name: "Telepathy", desc: "Play with your hands revealed" },
+      { name: "First Blood", desc: `The first player to deal combat damage becomes the <a href="https://scryfall.com/card/tecc/12/the-monarch" target="_blank">Monarch.</a>` },
+      { name: "Oathbreaker", desc: "Choose an instant or sorcery in your deck and place it in your command zone. Each time it's cast increase its cost by {2}" },
+      { name: "Time Crunch", desc: "Players start with 30 life, draw an extra card on their draw step and may play an additional land each turn." },
+      { name: "Limited Influence", desc: "You may only attack and target the player to the left and right" },
+      { name: "Two Headed Giant", desc: `Following turn order 1st and 2nd, 3rd and 4th form teams. <a href="https://magic.wizards.com/en/formats/two-headed-giant" target="_blank">Two Headed Giant Rules</a>` },
+      { name: "TBD", desc: "Rotate your chosen decks to the right or one place to the left" },
+      { name: "Bob's Paradise", desc: `Each player has a <a href="https://scryfall.com/card/j25/114/dark-confidant" target="_blank">Dark Confidant</a> Emblem` },
+      { name: "Struck Gold", desc: `Each player starts the game with 10 <a href="https://scryfall.com/card/txln/9/treasure" target="_blank">treasure tokens</a>` },
+    ];
+
+    const CHAOS_MODIFIERS = [
+      { name: "Pandemonium", desc: "All creatures have haste and must attack each turn if able" },
+      { name: "Mental Magic", desc: `Each player has a <a href="https://scryfall.com/card/und/26/richard-garfield-phd" target="_blank">Richard Garfield P.H.D.</a> Emblem` },
+      { name: "Sharing is Caring", desc: "Each player may draw from any library and can use mana as though it were any color" },
+    ];
+
+    const display = document.getElementById('display');
+    const modName = document.getElementById('mod-name');
+    const modDesc = document.getElementById('mod-desc');
+    const chaosToggle = document.getElementById('chaosToggle');
+
+    let chaosMode = false;
+
+    function toggleChaos() {
+      chaosMode = !chaosMode;
+      chaosToggle.classList.toggle('active', chaosMode);
+    }
+
+    function parseMana(text) {
+      return text.replace(/\{([^}]+)\}/g, (match, symbol) => {
+        return `<i class="ms ms-${symbol.toLowerCase()} ms-cost"></i>`;
+      });
+    }
+
+    function drawModifier() {
+      display.classList.remove('revealed');
+      display.classList.add('flipping');
+
+      const pool = chaosMode ? CHAOS_MODIFIERS : MODIFIERS;
+      const modifier = pool[Math.floor(Math.random() * pool.length)];
+
+      setTimeout(() => {
+        modName.innerHTML = modifier.name;
+        modDesc.innerHTML = parseMana(modifier.desc);
+        display.classList.remove('flipping');
+        display.classList.add('revealed');
+      }, 350);
+    }
+  </script>
+</body>
+
+</html>
