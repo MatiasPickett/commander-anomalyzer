@@ -559,9 +559,11 @@
 
   <script>
     const MODIFIERS = [
-      { name: "You Activated my Trap Card!", desc: `All permanents have <a href="https://mtg.fandom.com/wiki/Morph" target="_blank">Morph</a>, where its morph cost is equal to the card's mana cost minus {1}.` },
+      { name: "You Activated my Trap Card!", desc: `All permanents have <a href="https://mtg.fandom.com/wiki/Morph" target="_blank">Morph</a>, where its morph cost is equal to the card's mana cost minus {2}.` },
       { name: "Telepathy", desc: "Play with your hands revealed" },
       { name: "First Blood", desc: `The first player to deal combat damage becomes the <a href="https://scryfall.com/card/tecc/12/the-monarch" target="_blank">Monarch.</a>` },
+      { name: "Lieutenant", desc: "Choose a creature in your deck and place it in your command zone. Each time it's cast increase its cost by {3}"},
+      { name: "Jump Start", desc: "Each player starts with a sol ring + one other card of their choice in their opening hand"},
       { name: "Oathbreaker", desc: "Choose an instant or sorcery in your deck and place it in your command zone. Each time it's cast increase its cost by {2}" },
       { name: "Time Crunch", desc: "Players start with 30 life, draw an extra card on their draw step and may play an additional land each turn." },
       { name: "Limited Influence", desc: "You may only attack and target the player to the left and right" },
@@ -569,12 +571,14 @@
       { name: "'Round you go", desc: "Rotate your chosen decks to the player on your right" },
       { name: "Bob's Paradise", desc: `Each player has a <a href="https://scryfall.com/card/j25/114/dark-confidant" target="_blank">Dark Confidant</a> Emblem` },
       { name: "Struck Gold", desc: `Each player starts the game with 10 <a href="https://scryfall.com/card/txln/9/treasure" target="_blank">treasure tokens</a>` },
+      { name: "Landlord", desc: "Start the game by putting three lands from your deck into your command zone. No mulligans." }
     ];
 
     const CHAOS_MODIFIERS = [
       { name: "Pandemonium", desc: "All creatures have haste and must attack each turn if able" },
       { name: "Mental Magic", desc: `Each player has a <a href="https://scryfall.com/card/und/26/richard-garfield-phd" target="_blank">Richard Garfield P.H.D.</a> Emblem` },
       { name: "Sharing is Caring", desc: "Each player may draw from any library and can use mana as though it were any color" },
+      { name: "1 in a Million", desc: "Each player may choose their starting 7 cards" },
     ];
 
     const display = document.getElementById('display');
